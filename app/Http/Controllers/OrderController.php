@@ -9,7 +9,6 @@ use App\Models\Product;
 use App\Models\User;
 use App\Models\Discount;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Session;
 
 
 class OrderController extends Controller
@@ -67,7 +66,6 @@ class OrderController extends Controller
         'total_price' => Discount::getApplyDiscountOnPrice($request->product_id,$request->quantity),
         'status' => Config('constants.numbers.number_hundred'),
         ]);
-        Session::flash('success', 'File has been uploaded successfully!');
 
         return response()->json([ Config('constants.api.success_status') => Config('constants.api.success_message') ]);
     }
@@ -104,14 +102,14 @@ class OrderController extends Controller
             if(isset($request->time_search) && isset($request->text_search)){ // if time search and search query both are set
 
                 $time_search_query = '';
-                if($request->time_search == 7){ // text search from last 7 days
+                if($request->time_search == 7){  // text search from last 7 days
                     $time_search_query = 'Date(orders.created_at) >= (CURDATE() - INTERVAL '.$request->time_search.' DAY)';
                 } else {
                     $time_search_query = 'Date(orders.created_at) = CURDATE()';
                 }
                 $datatable->whereRaw($time_search_query)
                         ->where('products.name', 'LIKE', '%'.$request->text_search.'%')
-                        ->orWhere('users.name', 'LIKE', '%'.$request->text_search.'%');
+                        ->orWhere('users.name', 'LIKE', '%'.$request->text_search.'%')->whereRaw($time_search_query);
             } else {
                 if($request->time_search == 7){ // if time search from last days
                     $datatable->whereRaw('Date(orders.created_at) >= (CURDATE() - INTERVAL '.$request->time_search.' DAY)');
