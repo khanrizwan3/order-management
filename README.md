@@ -23,3 +23,7 @@ For building layout builds:
 npm install
 
 npm run dev 
+
+To run test: 
+
+vendor/phpunit/phpunit/phpunit --testsuite Feature Tests
